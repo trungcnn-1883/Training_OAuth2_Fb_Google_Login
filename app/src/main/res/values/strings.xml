@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Training_Login</string>
+    <string name="facebook_app_id">520960035315691</string>
+    <string name="fb_login_protocol_scheme">fb520960035315691</string>
+    <string name="choose">Choose your login type</string>
+
+</resources>
