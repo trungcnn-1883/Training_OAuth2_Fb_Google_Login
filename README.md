@@ -126,11 +126,11 @@ Xong sẽ xuất hiện ra như sau
 
 Ta sẽ được app
 
-<img src="img/it10.png">
+<img src="img/it10.jpg">
 
-<img src="img/it11.png">
+<img src="img/it11.jpg">
 
-<img src="img/it12.png">
+<img src="img/it12.jpg">
 
 
 
