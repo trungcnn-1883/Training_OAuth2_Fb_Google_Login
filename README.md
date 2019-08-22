@@ -100,5 +100,41 @@ Có 4 loại Grant trong OAuth 2
 
 ## II. Login sử dụng Facebook
 
+Sử dụng tài khoản facebook để có thể tạo tài khoản, đăng nhập trên ứng dụng khác
+
+Các bước thực hiện
+
+1. Nhấn tạo ứng dụng
+
+<img src="img/it6.png">
+
+Sẽ xuất hiện bảng
+
+<img src="img/it3.png">
+
+2. Chọn sản phẩm
+
+<img src="img/it7.png">
+
+Xong sẽ xuất hiện ra như sau
+
+<img src="img/it8.png">
+
+3. Làm theo các bước như sau
+
+<img src="img/it9.png">
+
+Ta sẽ được app
+
+<img src="img/it10.png">
+
+<img src="img/it11.png">
+
+<img src="img/it12.png">
+
+
+
+
+
 
 

@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.facebook.*
 import com.facebook.appevents.AppEventsLogger
+import com.facebook.login.LoginBehavior
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 
@@ -31,7 +32,8 @@ class MainActivity : AppCompatActivity() {
         AppEventsLogger.activateApp(this);
         initComponent()
 
-        mLoginButton?.setReadPermissions("email")
+//        mLoginButton?.setReadPermissions("email")
+        mLoginButton?.loginBehavior = LoginBehavior.NATIVE_ONLY
         mLoginButton?.registerCallback(mCallBackManager, object : FacebookCallback<LoginResult> {
 
             override fun onSuccess(result: LoginResult?) {
@@ -51,7 +53,25 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        mLoginButton?.setOnClickListener {
+            when (isLoggedInFacebook()) {
+                false -> {
+//                    mTypeTxt?.text = "You have logouted from Facebook"
+//                    mAvatarImg?.setImageDrawable(null)
+//                    mNameTxt?.text = ""
+                }
+                true -> {
+                    mTypeTxt?.text = "You have logouted from Facebook"
+                    mAvatarImg?.setImageDrawable(null)
+                    mNameTxt?.text = ""
+                }
+            }
+        }
 
+    }
+
+    fun isLoggedInFacebook(): Boolean {
+        return AccessToken.getCurrentAccessToken() != null
     }
 
     private fun initComponent() {
@@ -67,16 +87,18 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("Face1", "onActivityResult")
 
-        mProfile = Profile.getCurrentProfile()
-        mTypeTxt?.text = "You have logined successfully using Facebook"
-        Glide.with(this@MainActivity).load(
-            mProfile?.getProfilePictureUri(
-                100,
-                100
-            )
-        ).into(mAvatarImg)
-        mNameTxt?.text = mProfile?.name
+        if (Profile.getCurrentProfile() != null) {
+            mProfile = Profile.getCurrentProfile()
+            mTypeTxt?.text = "You have logined successfully using Facebook"
+            Glide.with(this@MainActivity).load(
+                mProfile?.getProfilePictureUri(
+                    100,
+                    100
+                )
+            ).into(mAvatarImg)
+            mNameTxt?.text = mProfile?.name
 
+        }
     }
 
     override fun onDestroy() {
