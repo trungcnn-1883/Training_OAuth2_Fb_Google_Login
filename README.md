@@ -132,6 +132,141 @@ Ta sẽ được app
 
 <img src="img/it12.jpg" width = "280">
 
+## III. Login sử dụng Google
+
+Các bước thực hiện
+
+1. Add google maven in build.gradle in project's top-level
+
+```
+allprojects {
+    repositories {
+        google()
+
+        // If you're using a version of Gradle lower than 4.1, you must instead use:
+        // maven {
+        //     url 'https://maven.google.com'
+        // }
+    }
+}
+```
+
+Add Google Play service
+
+```
+apply plugin: 'com.android.application'
+    ...
+
+    dependencies {
+        implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    }
+```
+2. 
+
+Add a project 
+
+<img src="img/it15.jpg">
+
+Điền thông tin
+
+<img src="img/it14.jpg" width = "280">
+
+3. Configure Google Sign-in và GoogleSignInClient object
+
+```
+// Configure sign-in to request the user's ID, email address, and basic
+// profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+         .requestId()
+         .requestProfile()
+         .requestScopes()
+         .build();
+
+mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+```
+
+4. Thêm nút Sign-in with Google
+
+```
+<com.google.android.gms.common.SignInButton
+ android:id="@+id/sign_in_button"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content" />
+```
+ 
+<img src="https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png">
+
+Có thể thay đổi size cho button: SIZE_STANDARD, SIZE_WIDE, SIZE_ICON_ONLY
+
+5. Bắt sự kiện cho nút 
+
+```
+
+@Override
+public void onClick(View v) {
+    switch (v.getId()) {
+        case R.id.sign_in_button:
+            signIn();
+            break;
+        // ...
+    }
+}
+
+private void signIn() {
+    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+    startActivityForResult(signInIntent, RC_SIGN_IN);
+}
+
+
+```
+
+6. Lấy thông tin về và xử lý
+
+```
+@Override
+public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+    if (requestCode == RC_SIGN_IN) {
+        // The Task returned from this call is always completed, no need to attach
+        // a listener.
+        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+        handleSignInResult(task);
+    }
+}
+```
+
+7. Update UI
+
+```
+private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+    try {
+        GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+        // Signed in successfully, show authenticated UI.
+        updateUI(account);
+    } catch (ApiException e) {
+        // The ApiException status code indicates the detailed failure reason.
+        // Please refer to the GoogleSignInStatusCodes class reference for more information.
+        Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+        updateUI(null);
+    }
+}
+```
+
+Kết quả: 
+
+<img src="img/it16.jpg" width = "280">
+
+<img src="img/it17.jpg" width = "280">
+
+<img src="img/it18.jpg" width = "280">
+
+
+
+
+
 
 
 

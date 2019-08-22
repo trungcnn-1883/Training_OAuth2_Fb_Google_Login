@@ -1,9 +1,11 @@
 package gooner.demo.login
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -12,16 +14,28 @@ import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginBehavior
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.SignInButton
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 
 
 class MainActivity : AppCompatActivity() {
 
-    var mLoginButton: LoginButton? = null
+    private val RC_SIGN_IN: Int = 1000
+    var mLoginFaceButton: LoginButton? = null
+    var mLoginGoogleButton: SignInButton? = null
+    var mLogoutGoogleButton: Button? = null
     var mTypeTxt: TextView? = null
     var mNameTxt: TextView? = null
-    var mAvatarImg: ImageView? = null
+    lateinit var mAvatarImg: ImageView
     lateinit var mCallBackManager: CallbackManager
     lateinit var mProfile: Profile
+    lateinit var mGoogleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,17 +43,62 @@ class MainActivity : AppCompatActivity() {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main)
 
-        AppEventsLogger.activateApp(this);
-        initComponent()
+        initCommonComponent()
 
-//        mLoginButton?.setReadPermissions("email")
-        mLoginButton?.loginBehavior = LoginBehavior.NATIVE_ONLY
-        mLoginButton?.registerCallback(mCallBackManager, object : FacebookCallback<LoginResult> {
+        // Init component for facebook
+        initFacebookComponent()
+
+        // Init component for google
+        initGoogleComponent()
+
+    }
+
+    private fun initCommonComponent() {
+        mCallBackManager = CallbackManager.Factory.create()
+        mLoginFaceButton = findViewById(R.id.main_btn_login_facebook) as LoginButton
+        mLoginGoogleButton = findViewById(R.id.main_btn_login_google)
+        mTypeTxt = findViewById(R.id.main_type)
+        mNameTxt = findViewById(R.id.main_user_name)
+        mAvatarImg = findViewById(R.id.main_avatar_img)
+
+        mLogoutGoogleButton = findViewById(R.id.main_sign_out_btn)
+        mLoginGoogleButton?.setSize(SignInButton.SIZE_WIDE)
+    }
+
+    private fun initGoogleComponent() {
+        var gso: GoogleSignInOptions = GoogleSignInOptions
+            .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        mLoginGoogleButton?.setOnClickListener {
+            startActivityForResult(mGoogleSignInClient.signInIntent, RC_SIGN_IN)
+        }
+
+        mLogoutGoogleButton?.setOnClickListener {
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, object : OnCompleteListener<Void> {
+                override fun onComplete(p0: Task<Void>) {
+                    mLoginGoogleButton?.visibility = View.VISIBLE
+                    mLogoutGoogleButton?.visibility = View.GONE
+                    mNameTxt?.text = ""
+                    mTypeTxt?.text = "You have logouted from Google"
+                    mAvatarImg.setImageDrawable(null)
+                    mLoginFaceButton?.visibility = View.VISIBLE
+                }
+            })
+        }
+    }
+
+    private fun initFacebookComponent() {
+        AppEventsLogger.activateApp(this);
+
+        mLoginFaceButton?.loginBehavior = LoginBehavior.NATIVE_ONLY
+
+        mLoginFaceButton?.registerCallback(mCallBackManager, object : FacebookCallback<LoginResult> {
 
             override fun onSuccess(result: LoginResult?) {
                 Log.d("Face1", "Success")
-
-
+                mLoginGoogleButton?.visibility = View.GONE
             }
 
             override fun onCancel() {
@@ -53,7 +112,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mLoginButton?.setOnClickListener {
+        mLoginFaceButton?.setOnClickListener {
             when (isLoggedInFacebook()) {
                 false -> {
 //                    mTypeTxt?.text = "You have logouted from Facebook"
@@ -61,25 +120,17 @@ class MainActivity : AppCompatActivity() {
 //                    mNameTxt?.text = ""
                 }
                 true -> {
+                    mLoginGoogleButton?.visibility = View.VISIBLE
                     mTypeTxt?.text = "You have logouted from Facebook"
                     mAvatarImg?.setImageDrawable(null)
                     mNameTxt?.text = ""
                 }
             }
         }
-
     }
 
     fun isLoggedInFacebook(): Boolean {
         return AccessToken.getCurrentAccessToken() != null
-    }
-
-    private fun initComponent() {
-        mCallBackManager = CallbackManager.Factory.create()
-        mLoginButton = findViewById(R.id.main_btn_login_facebook) as LoginButton
-        mTypeTxt = findViewById(R.id.main_type)
-        mNameTxt = findViewById(R.id.main_user_name)
-        mAvatarImg = findViewById(R.id.main_avatar_img)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,6 +150,38 @@ class MainActivity : AppCompatActivity() {
             mNameTxt?.text = mProfile?.name
 
         }
+
+        if (requestCode == RC_SIGN_IN) {
+            var task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+
+    private fun handleSignInResult(task: Task<GoogleSignInAccount>) {
+        try {
+            val account = task.getResult(ApiException::class.java)
+
+            // Signed in successfully, show authenticated UI.
+            updateUI(account)
+        } catch (e: ApiException) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.d("Google1", "signInResult:failed code=" + e.statusCode)
+            updateUI(null)
+        }
+
+    }
+
+    private fun updateUI(account: GoogleSignInAccount?) {
+        mNameTxt?.text = account?.displayName
+        Glide.with(this@MainActivity).load(
+            account?.photoUrl
+        ).into(mAvatarImg)
+        mLoginGoogleButton?.visibility = View.GONE
+        mLogoutGoogleButton?.visibility = View.VISIBLE
+        mTypeTxt?.text = "You have logined using Google successfully"
+        mLoginFaceButton?.visibility = View.GONE
+
     }
 
     override fun onDestroy() {
