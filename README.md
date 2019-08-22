@@ -165,11 +165,11 @@ apply plugin: 'com.android.application'
 
 Add a project 
 
-<img src="img/it15.jpg">
+<img src="img/it15.png">
 
 Điền thông tin
 
-<img src="img/it14.jpg" width = "280">
+<img src="img/it14.png" width = "280">
 
 3. Configure Google Sign-in và GoogleSignInClient object
 
