@@ -10,7 +10,7 @@ Về cơ bản thì oauth là một phương thức chứng thực, mà nhờ đ
 
 Các trào lưu cũng như sự lan rộng của khái niệm OAuth bắt đầu khi mà các dịch vụ mạng xã hội như twitter hay facebook nở rộ, đặc biệt khi các công ty như twitter cung cấp API cho bên thứ 3 để có thể truy cập vào tài nguyên của người dùng, qua đó mở nên một thị trường mới gọi là 3rd party app, ví dụ như tweetdeck hay hootsuite. Chính nhờ OAuth mà ta có thể đăng nhập, tạo tài khoản trên các ứng dụng giải trí (phim, game, nhạc, ...), mua sắm (tiki, lazada, shoppe), ... mà ko cần mất thời gian tạo tài khoản.
 
-### b. OAuth là gì ?
+### b. OAuth (Open Authentication) là gì ?
 
 Là một phương thức chứng thực giúp các ứng dụng có thể chia sẻ tài nguyên với nhau mà không cần chia sẻ 
 **username** và **password**. Từ Auth mang hai nghĩa:
