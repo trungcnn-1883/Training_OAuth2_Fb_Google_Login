@@ -22,6 +22,8 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.OnCompleteListener
+import com.twitter.sdk.android.core.*
+import com.twitter.sdk.android.core.identity.TwitterLoginButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private val RC_SIGN_IN: Int = 1000
     var mLoginFaceButton: LoginButton? = null
     var mLoginGoogleButton: SignInButton? = null
+    var mLoginTwitterButton: TwitterLoginButton? = null
     var mLogoutGoogleButton: Button? = null
     var mTypeTxt: TextView? = null
     var mNameTxt: TextView? = null
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Twitter.initialize(this)
         FacebookSdk.setApplicationId(getString(R.string.facebook_app_id))
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main)
@@ -51,12 +55,30 @@ class MainActivity : AppCompatActivity() {
         // Init component for google
         initGoogleComponent()
 
+        // Init component for twitter
+        initTwitterComponent()
+
+    }
+
+    private fun initTwitterComponent() {
+        mLoginTwitterButton?.setCallback(object : Callback<TwitterSession>() {
+
+            override fun success(result: Result<TwitterSession>?) {
+                Log.d("Twiter", "Success")
+            }
+
+            override fun failure(exception: TwitterException?) {
+                Log.d("Twiter", "Fail")
+
+            }
+        })
     }
 
     private fun initCommonComponent() {
         mCallBackManager = CallbackManager.Factory.create()
         mLoginFaceButton = findViewById(R.id.main_btn_login_facebook) as LoginButton
         mLoginGoogleButton = findViewById(R.id.main_btn_login_google)
+        mLoginTwitterButton = findViewById(R.id.main_twitter_login_btn)
         mTypeTxt = findViewById(R.id.main_type)
         mNameTxt = findViewById(R.id.main_user_name)
         mAvatarImg = findViewById(R.id.main_avatar_img)
@@ -135,6 +157,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         mCallBackManager.onActivityResult(requestCode, resultCode, data)
+        mLoginTwitterButton?.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data)
         Log.d("Face1", "onActivityResult")
 
