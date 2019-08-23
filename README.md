@@ -82,9 +82,9 @@ Khi ứng dụng của bạn được đăng ký, bên dịch vụ sẽ phát h�
 
 - **Client Identifier**: là một chuỗi ký tự được sử dụng bởi Service API để định danh ứng dụng, đồng thời cũng được dùng để xây dựng "authorization URL" hiển thị phía User.
 
-<img src="img/it5.png">
-
 - **Client Secret**: là một chuỗi ký tự được sử dụng để xác thực định danh (ID) của ứng dụng khi ứng dụng yêu cầu truy cập thông tin tài khoản của User. Chuỗi này được giữ bí mật giữa Application và API.
+
+<img src="img/it13.png">
 
 ### g. Authorization Grant
 
