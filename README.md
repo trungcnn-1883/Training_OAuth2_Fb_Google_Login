@@ -263,8 +263,11 @@ Kết quả:
 
 <img src="img/it18.jpg" width = "280">
 
+### IV. Login sử dụng Twitter
 
+Tham khảo link
 
+https://github.com/twitter-archive/twitter-kit-android/wiki/Log-In-with-Twitter
 
 
 
